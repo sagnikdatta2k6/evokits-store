@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EVOKITS Store ⚽
 
-## Getting Started
+Welcome to the **EVOKITS** repository! This is a modern, premium e-commerce platform dedicated to authentic football jerseys from the biggest clubs around the world. Built with a bold "neobrutalism" aesthetic, EVOKITS brings the passion of the pitch directly to your screen.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Premium Design:** A custom "neobrutalist" interface featuring vibrant colors, stark borders, and sleek micro-animations.
+- **Live Inventory Engine:** Real-time stock tracking. Sizes automatically deduct upon checkout and immediately reflect as "Out of Stock" to other users if depleted.
+- **Dynamic Visuals:** Supports both custom gradient silhouettes and real image uploads for jerseys.
+- **Admin Dashboard:** Fully authenticated, server-side protected admin panel to manage orders and inventory.
+- **User Profiles:** Customers can track their order history, view invoices, and manage personal details.
+- **Full Checkout Flow:** Includes cart management, wishlist, and discount code ("EVO10") capabilities.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework:** Next.js 14 (App Router)
+- **Styling:** Vanilla CSS (Global Variables & Neobrutalism Design System)
+- **State Management:** Zustand (Persisted for Cart & Inventory)
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Getting Started
 
-## Learn More
+To run the EVOKITS store locally:
 
-To learn more about Next.js, take a look at the following resources:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/sagnikdatta2k6/evokits-store.git
+   cd evokits-store
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+4. **Explore the app:**
+   - **Storefront:** Open `http://localhost:3000` in your browser.
+   - **Admin Portal:** Navigate to `http://localhost:3000/admin`. (Default password is `admin123`).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🤝 Contributing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is currently a prototype built for the love of the game. Feel free to fork, explore, and submit pull requests if you have cool ideas!
+
+---
+
+*Made with passion for football fans everywhere.*
