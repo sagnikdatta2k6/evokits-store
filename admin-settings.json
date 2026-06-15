@@ -1,0 +1,5 @@
+{
+  "passwordHash": "admin123",
+  "twoFactorEnabled": true,
+  "twoFactorSecret": "MR2FUOCYNFKW2SKOMI2VC2KOPBHFM5TY"
+}

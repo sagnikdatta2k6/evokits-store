@@ -14,7 +14,7 @@ export interface Order {
   date: string;
   items: CartItem[];
   total: number;
-  status: 'Processing' | 'Shipped' | 'Delivered';
+  status: "Processing" | "Shipped" | "Delivered" | "Cancelled";
 }
 
 export interface UserProfile {
@@ -43,6 +43,7 @@ interface AppState {
   orders: Order[];
   addOrder: (order: Order) => void;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
+  cancelOrder: (orderId: string) => void;
   processOrder: (order: Order, cartItems: CartItem[]) => void;
 
   // Inventory (Admin)
@@ -127,6 +128,36 @@ export const useStore = create<AppState>()(
       updateOrderStatus: (orderId, status) => set({
         orders: get().orders.map(o => o.id === orderId ? { ...o, status } : o)
       }),
+      cancelOrder: (orderId) => {
+        const order = get().orders.find(o => o.id === orderId);
+        if (!order || order.status === 'Cancelled') return;
+
+        const currentInventory = get().inventory;
+        const updatedInventory = currentInventory.map(jersey => {
+          // Find all items in this cancelled order for this specific jersey
+          const itemsForJersey = order.items.filter(item => item.jersey.id === jersey.id);
+          if (itemsForJersey.length === 0) return jersey;
+
+          // Copy stock
+          const newStock = { ...jersey.stock };
+          
+          // Restore quantities
+          itemsForJersey.forEach(item => {
+            if (newStock[item.size] !== undefined) {
+              newStock[item.size] += item.quantity;
+            } else {
+              newStock[item.size] = item.quantity;
+            }
+          });
+
+          return { ...jersey, stock: newStock };
+        });
+
+        set({
+          orders: get().orders.map(o => o.id === orderId ? { ...o, status: 'Cancelled' } : o),
+          inventory: updatedInventory,
+        });
+      },
       processOrder: (order, cartItems) => {
         const currentInventory = get().inventory;
         const updatedInventory = currentInventory.map(jersey => {

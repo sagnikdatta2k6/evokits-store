@@ -61,15 +61,21 @@ export default function HeroSection() {
             Prices.
           </motion.h1>
 
-          <motion.p
-            className="hero__subtitle"
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
+            className="neo-card"
+            style={{ background: 'var(--neo-white)', padding: 'var(--space-md)', display: 'inline-block', marginBottom: 'var(--space-xl)' }}
           >
-            Bringing football fans closer to the game with premium kits from
-            clubs around the world. Your team, your passion, your jersey.
-          </motion.p>
+            <p
+              className="hero__subtitle"
+              style={{ opacity: 1, fontWeight: 600, color: 'var(--neo-black)', margin: 0 }}
+            >
+              Bringing football fans closer to the game with premium kits from
+              clubs around the world. Your team, your passion, your jersey.
+            </p>
+          </motion.div>
 
           <motion.div
             className="hero__actions"

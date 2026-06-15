@@ -23,6 +23,7 @@ export default function InventoryPage() {
     color1: "#ffffff",
     color2: "#000000",
     image: "",
+    gallery: [] as string[],
     category: "",
     stockS: 10,
     stockM: 10,
@@ -51,6 +52,7 @@ export default function InventoryPage() {
       color1: jersey.colors[0],
       color2: jersey.colors[1],
       image: jersey.image || "",
+      gallery: jersey.gallery || [],
       category: jersey.category || "",
       stockS: jersey.stock?.S ?? 0,
       stockM: jersey.stock?.M ?? 0,
@@ -80,6 +82,26 @@ export default function InventoryPage() {
     }
   };
 
+  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFormData((prev) => ({ ...prev, gallery: [...prev.gallery, reader.result as string] }));
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  const removeGalleryImage = (indexToRemove: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, idx) => idx !== indexToRemove)
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -93,6 +115,7 @@ export default function InventoryPage() {
       tag: formData.tag as any,
       colors: [formData.color1, formData.color2],
       image: formData.image || undefined,
+      gallery: formData.gallery.length > 0 ? formData.gallery : undefined,
       category: formData.category || undefined,
       stock: {
         S: formData.stockS,
@@ -215,9 +238,9 @@ export default function InventoryPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--space-md)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--space-md)' }}>
                   <div>
-                    <label className="neo-label">Local Image Upload</label>
+                    <label className="neo-label">Main Image Upload</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
                       <input type="file" accept="image/*" onChange={handleImageUpload} style={{ flex: 1 }} />
                       {formData.image && (
@@ -229,6 +252,20 @@ export default function InventoryPage() {
                         </div>
                       )}
                     </div>
+                  </div>
+                  <div>
+                    <label className="neo-label">Gallery Upload</label>
+                    <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} style={{ width: '100%' }} />
+                    {formData.gallery && formData.gallery.length > 0 && (
+                      <div style={{ display: 'flex', gap: 'var(--space-xs)', marginTop: 'var(--space-xs)', flexWrap: 'wrap' }}>
+                        {formData.gallery.map((g, idx) => (
+                          <div key={idx} style={{ position: 'relative' }}>
+                            <img src={g} alt={`Gallery ${idx}`} style={{ width: 40, height: 40, objectFit: 'contain', border: '2px solid var(--neo-black)', borderRadius: '4px', background: 'var(--neo-white)' }} />
+                            <button type="button" onClick={() => removeGalleryImage(idx)} style={{ position: 'absolute', top: -5, right: -5, background: 'var(--neo-pink)', color: 'white', borderRadius: '50%', border: 'none', cursor: 'pointer', width: 16, height: 16, fontSize: '10px' }}>×</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="neo-label">Category</label>

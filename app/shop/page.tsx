@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, SlidersHorizontal, X, ShoppingBag, Check, ChevronDown, Heart } from "lucide-react";
 import { jerseys, type Jersey } from "@/lib/data";
@@ -88,10 +88,6 @@ function ShopJerseyCard({ jersey, index }: { jersey: Jersey; index: number }) {
 
         {jersey.tag && (
           <span className={`neo-badge ${tagColors[jersey.tag]} jersey-card__tag`}>
-            {jersey.tag === "hot" && "🔥 "}
-            {jersey.tag === "sale" && "💸 "}
-            {jersey.tag === "limited" && "⏳ "}
-            {jersey.tag === "new" && "✨ "}
             {jersey.tag}
           </span>
         )}
@@ -133,12 +129,17 @@ function ShopJerseyCard({ jersey, index }: { jersey: Jersey; index: number }) {
 }
 
 export default function ShopPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const { inventory } = useStore();
   const [search, setSearch] = useState("");
   const [selectedLeague, setSelectedLeague] = useState<string>("All");
   const [selectedPrice, setSelectedPrice] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"default" | "low" | "high">("default");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const leagues = Array.from(new Set(inventory.map((j) => j.league)));
 
@@ -184,6 +185,8 @@ export default function ShopPage() {
     setSearch("");
   };
 
+  if (!isMounted) return null;
+
   return (
     <section className="shop-page">
       <div className="container">
@@ -194,10 +197,12 @@ export default function ShopPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div>
-            <span className="neo-badge neo-badge--lime">👕 Shop</span>
-            <h1 className="shop-page__title">All Jerseys</h1>
-            <p className="shop-page__subtitle">
+          <div className="neo-card" style={{ background: 'var(--neo-white)', padding: 'var(--space-lg)', display: 'inline-block' }}>
+            <div style={{ marginBottom: 'var(--space-sm)' }}>
+              <span className="neo-badge neo-badge--lime">Shop</span>
+            </div>
+            <h1 className="shop-page__title" style={{ margin: 0, lineHeight: 1.1 }}>All Jerseys</h1>
+            <p className="shop-page__subtitle" style={{ opacity: 1, fontWeight: 600, margin: 0, marginTop: '12px' }}>
               Browse our collection of authentic football jerseys from top clubs worldwide.
             </p>
           </div>

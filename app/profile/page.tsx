@@ -9,12 +9,13 @@ import Link from "next/link";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { userProfile, updateProfile, orders } = useStore();
+  const { userProfile, updateProfile, orders, cancelOrder } = useStore();
   const [activeTab, setActiveTab] = useState<"profile" | "orders" | "help">("profile");
 
   // Local state for the form
   const [formData, setFormData] = useState(userProfile);
   const [saved, setSaved] = useState(false);
+  const [confirmingCancelId, setConfirmingCancelId] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -38,47 +39,49 @@ export default function ProfilePage() {
   };
 
   return (
-    <section className="profile-page" style={{ paddingTop: 'calc(var(--nav-height) + var(--space-2xl))', paddingBottom: 'var(--space-3xl)', minHeight: '100vh', background: 'var(--neo-white)' }}>
+    <section className="profile-page" style={{ paddingTop: 'calc(var(--nav-height) + var(--space-2xl))', paddingBottom: 'var(--space-3xl)', minHeight: '100vh', background: 'transparent' }}>
       <div className="container" style={{ maxWidth: '900px' }}>
         
-        {/* Header */}
-        <div style={{ marginBottom: 'var(--space-xl)', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-          <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--neo-yellow)', border: '2px solid var(--neo-black)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-            {userProfile.avatar ? (
-              <img src={userProfile.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <User size={40} />
-            )}
+        <div className="neo-card" style={{ marginBottom: 'var(--space-xl)', padding: 'var(--space-lg)', background: 'var(--neo-white)' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
+            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--neo-yellow)', border: '2px solid var(--neo-black)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              {userProfile.avatar ? (
+                <img src={userProfile.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <User size={40} />
+              )}
+            </div>
+            <div>
+              <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem', lineHeight: 1.1 }}>Welcome, {userProfile.name.split(" ")[0]}</h1>
+              <p style={{ opacity: 0.7, margin: 0, fontWeight: 600 }}>@{userProfile.username}</p>
+            </div>
           </div>
-          <div>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '0.2rem' }}>Welcome, {userProfile.name.split(" ")[0]}</h1>
-            <p style={{ opacity: 0.7 }}>@{userProfile.username}</p>
-          </div>
-        </div>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: 'var(--space-sm)', marginBottom: 'var(--space-xl)', borderBottom: '2px solid var(--neo-black)', paddingBottom: 'var(--space-sm)' }}>
-          <button 
-            className={`neo-btn neo-btn--small ${activeTab === 'profile' ? 'neo-btn--dark' : 'neo-btn--outline'}`}
-            onClick={() => setActiveTab('profile')}
-            style={{ borderRadius: 'var(--radius-sm)' }}
-          >
-            <User size={16} /> Personal Info
-          </button>
-          <button 
-            className={`neo-btn neo-btn--small ${activeTab === 'orders' ? 'neo-btn--dark' : 'neo-btn--outline'}`}
-            onClick={() => setActiveTab('orders')}
-            style={{ borderRadius: 'var(--radius-sm)' }}
-          >
-            <Package size={16} /> Order History
-          </button>
-          <button 
-            className={`neo-btn neo-btn--small ${activeTab === 'help' ? 'neo-btn--dark' : 'neo-btn--outline'}`}
-            onClick={() => setActiveTab('help')}
-            style={{ borderRadius: 'var(--radius-sm)' }}
-          >
-            <HelpCircle size={16} /> Help & Support
-          </button>
+          {/* Tabs */}
+          <div style={{ display: 'flex', gap: 'var(--space-sm)', borderTop: '2px solid var(--neo-black)', paddingTop: 'var(--space-md)' }}>
+            <button 
+              className={`neo-btn neo-btn--small ${activeTab === 'profile' ? 'neo-btn--dark' : 'neo-btn--outline'}`}
+              onClick={() => setActiveTab('profile')}
+              style={{ borderRadius: 'var(--radius-sm)' }}
+            >
+              <User size={16} /> Personal Info
+            </button>
+            <button 
+              className={`neo-btn neo-btn--small ${activeTab === 'orders' ? 'neo-btn--dark' : 'neo-btn--outline'}`}
+              onClick={() => setActiveTab('orders')}
+              style={{ borderRadius: 'var(--radius-sm)' }}
+            >
+              <Package size={16} /> Order History
+            </button>
+            <button 
+              className={`neo-btn neo-btn--small ${activeTab === 'help' ? 'neo-btn--dark' : 'neo-btn--outline'}`}
+              onClick={() => setActiveTab('help')}
+              style={{ borderRadius: 'var(--radius-sm)' }}
+            >
+              <HelpCircle size={16} /> Help & Support
+            </button>
+          </div>
         </div>
 
         {/* Tab Content */}
@@ -162,10 +165,10 @@ export default function ProfilePage() {
                     <div key={order.id} className="neo-card" style={{ padding: 'var(--space-lg)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--neo-black)', paddingBottom: 'var(--space-sm)', marginBottom: 'var(--space-md)' }}>
                         <div>
-                          <span style={{ fontWeight: 800, fontSize: '1.2rem' }}>Order #{order.id}</span>
+                          <span style={{ fontWeight: 800, fontSize: '1.2rem', textDecoration: order.status === 'Cancelled' ? 'line-through' : 'none' }}>Order #{order.id}</span>
                           <span style={{ marginLeft: 'var(--space-sm)', opacity: 0.6, fontSize: '0.9rem' }}>{order.date}</span>
                         </div>
-                        <span className="neo-badge neo-badge--lime">{order.status}</span>
+                        <span className={`neo-badge ${order.status === 'Cancelled' ? 'neo-badge--pink' : 'neo-badge--lime'}`}>{order.status}</span>
                       </div>
                       
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
@@ -188,17 +191,35 @@ export default function ProfilePage() {
                       </div>
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-md)', paddingTop: 'var(--space-md)', borderTop: '2px dashed var(--neo-black)' }}>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 900 }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 900, textDecoration: order.status === 'Cancelled' ? 'line-through' : 'none', opacity: order.status === 'Cancelled' ? 0.5 : 1 }}>
                           Total: ₹{order.total.toLocaleString("en-IN")}
                         </div>
-                        <Link 
-                          href={`/invoice/${order.id}`}
-                          target="_blank"
-                          className="neo-btn neo-btn--outline neo-btn--small"
-                          style={{ textDecoration: 'none' }}
-                        >
-                          <Download size={16} /> Download Invoice
-                        </Link>
+                        <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
+                          {order.status === 'Processing' && (
+                            <button 
+                              className={`neo-btn neo-btn--small ${confirmingCancelId === order.id ? 'neo-btn--dark' : 'neo-btn--pink'}`}
+                              onClick={() => {
+                                if (confirmingCancelId === order.id) {
+                                  cancelOrder(order.id);
+                                  setConfirmingCancelId(null);
+                                } else {
+                                  setConfirmingCancelId(order.id);
+                                  setTimeout(() => setConfirmingCancelId(null), 3000); // reset after 3s
+                                }
+                              }}
+                            >
+                              {confirmingCancelId === order.id ? 'Click to Confirm' : 'Cancel Order'}
+                            </button>
+                          )}
+                          <Link 
+                            href={`/invoice/${order.id}`}
+                            target="_blank"
+                            className={`neo-btn neo-btn--outline neo-btn--small ${order.status === 'Cancelled' ? 'disabled' : ''}`}
+                            style={{ textDecoration: 'none', pointerEvents: order.status === 'Cancelled' ? 'none' : 'auto', opacity: order.status === 'Cancelled' ? 0.5 : 1 }}
+                          >
+                            <Download size={16} /> Download Invoice
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   ))}

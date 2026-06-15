@@ -1,15 +1,29 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { getAdminSettings } from '@/lib/admin';
+import { authenticator } from 'otplib';
 
 export async function POST(req: Request) {
   try {
-    const { password } = await req.json();
+    const { password, token } = await req.json();
 
-    // Use environment variable in production. Hardcoded for prototype demonstration.
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+    const settings = getAdminSettings();
 
-    if (password === ADMIN_PASSWORD) {
-      // Create a secure session token (mock token for prototype)
+    if (password === settings.passwordHash) {
+      
+      // If 2FA is enabled, verify token
+      if (settings.twoFactorEnabled && settings.twoFactorSecret) {
+        if (!token) {
+          return NextResponse.json({ requires2FA: true });
+        }
+        
+        const isValid = authenticator.verify({ token, secret: settings.twoFactorSecret });
+        if (!isValid) {
+          return NextResponse.json({ error: 'Invalid authenticator code' }, { status: 401 });
+        }
+      }
+
+      // Create a secure session token
       const mockSessionToken = "admin_" + Math.random().toString(36).substr(2, 9);
       
       // Set HTTP-Only Cookie

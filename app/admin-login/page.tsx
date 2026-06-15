@@ -7,6 +7,8 @@ import { Lock } from "lucide-react";
 export default function AdminLoginPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
+  const [token, setToken] = useState("");
+  const [requires2FA, setRequires2FA] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -19,16 +21,16 @@ export default function AdminLoginPage() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, token }),
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Secure HTTP-Only cookie has been set!
-        // Redirect to admin dashboard
         router.push("/admin");
-        router.refresh(); // Force a refresh to ensure middleware picks up the new cookie
+        router.refresh(); 
+      } else if (response.ok && data.requires2FA) {
+        setRequires2FA(true);
       } else {
         setError(true);
       }
@@ -56,18 +58,35 @@ export default function AdminLoginPage() {
         <p style={{ marginBottom: 'var(--space-lg)', opacity: 0.7 }}>Server-Side Authentication Portal</p>
         
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-          <input 
-            type="password" 
-            className="neo-input" 
-            placeholder="Enter Master Password..." 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required 
-            disabled={loading}
-          />
-          {error && <p style={{ color: 'red', fontSize: '0.9rem', margin: 0, textAlign: 'left', fontWeight: 700 }}>❌ Incorrect password or server error.</p>}
+          {!requires2FA ? (
+            <input 
+              type="password" 
+              className="neo-input" 
+              placeholder="Enter Master Password..." 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required 
+              disabled={loading}
+            />
+          ) : (
+            <div>
+              <p style={{ fontWeight: 600, marginBottom: 'var(--space-sm)' }}>Two-Factor Authentication Required</p>
+              <input 
+                type="text" 
+                className="neo-input" 
+                placeholder="000000" 
+                maxLength={6}
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                required 
+                disabled={loading}
+                style={{ textAlign: 'center', letterSpacing: '4px', fontSize: '1.5rem', fontWeight: 800 }}
+              />
+            </div>
+          )}
+          {error && <p style={{ color: 'red', fontSize: '0.9rem', margin: 0, textAlign: 'left', fontWeight: 700 }}>❌ Incorrect password, code, or server error.</p>}
           <button type="submit" className="neo-btn neo-btn--primary" style={{ justifyContent: 'center' }} disabled={loading}>
-            {loading ? "Verifying Credentials..." : "Authenticate Server"}
+            {loading ? "Verifying..." : requires2FA ? "Submit Code" : "Authenticate Server"}
           </button>
         </form>
       </div>

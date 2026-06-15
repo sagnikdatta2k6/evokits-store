@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
   Phone,
   Mail,
@@ -15,6 +16,16 @@ import {
 export default function Footer() {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear();
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    import("@/lib/auth").then(({ isLoggedIn }) => {
+      setLoggedIn(isLoggedIn());
+      const handleAuthChange = () => setLoggedIn(isLoggedIn());
+      window.addEventListener("auth-change", handleAuthChange);
+      return () => window.removeEventListener("auth-change", handleAuthChange);
+    });
+  }, []);
 
   // Hide the customer Footer completely if we are on any admin route
   if (pathname.startsWith('/admin') || pathname.startsWith('/admin-login')) {
@@ -29,10 +40,10 @@ export default function Footer() {
   ];
 
   const supportLinks = [
-    { href: "/login", label: "My Account" },
+    { href: loggedIn ? "/profile" : "/login", label: "My Account" },
     { href: "/contact", label: "Order Inquiry" },
-    { href: "/about", label: "Shipping Info" },
-    { href: "/contact", label: "Returns" },
+    { href: "/shipping", label: "Shipping Info" },
+    { href: "/returns", label: "Returns" },
   ];
 
   return (

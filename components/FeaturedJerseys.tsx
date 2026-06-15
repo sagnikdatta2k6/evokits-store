@@ -1,9 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { featuredJerseys, type Jersey } from "@/lib/data";
-import { Heart } from "lucide-react";
+import { Heart, ArrowRight } from "lucide-react";
 
 import { useStore } from "@/lib/store";
 
@@ -81,10 +82,6 @@ function JerseyCard({ jersey, index }: { jersey: Jersey; index: number }) {
         {/* Tag */}
         {jersey.tag && (
           <span className={`neo-badge ${tagColors[jersey.tag]} jersey-card__tag`}>
-            {jersey.tag === "hot" && "🔥 "}
-            {jersey.tag === "sale" && "💸 "}
-            {jersey.tag === "limited" && "⏳ "}
-            {jersey.tag === "new" && "✨ "}
             {jersey.tag}
           </span>
         )}
@@ -118,8 +115,16 @@ function JerseyCard({ jersey, index }: { jersey: Jersey; index: number }) {
 }
 
 export default function FeaturedJerseys() {
+  const [isMounted, setIsMounted] = useState(false);
   const { inventory } = useStore();
-  const featured = inventory.slice(0, 4);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
+
+  const featured = inventory.slice(0, 3);
 
   return (
     <section className="featured section">
@@ -132,33 +137,47 @@ export default function FeaturedJerseys() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <span className="neo-badge neo-badge--orange">🔥 Trending Now</span>
-            <h2 className="featured__title">
-              Featured Kits
-            </h2>
-            <p className="featured__subtitle">
-              The most popular jerseys this season. Grab yours before they&#39;re gone.
-            </p>
+            <div className="neo-card" style={{ background: 'var(--neo-white)', padding: 'var(--space-lg)', display: 'inline-block' }}>
+              <div style={{ marginBottom: 'var(--space-sm)' }}>
+                <span className="neo-badge neo-badge--orange">Trending Now</span>
+              </div>
+              <h2 className="featured__title" style={{ margin: 0, lineHeight: 1.1 }}>
+                Featured Kits
+              </h2>
+              <p className="featured__subtitle" style={{ opacity: 1, fontWeight: 600, margin: 0, marginTop: '12px' }}>
+                The most popular jerseys this season. Grab yours before they&#39;re gone.
+              </p>
+            </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Link href="/shop" className="neo-btn neo-btn--outline">
-              View All Jerseys →
-            </Link>
-          </motion.div>
         </div>
 
         {/* Grid */}
-        <div className="jersey-grid">
-          {featured.map((jersey, index) => (
+        <div className="featured__grid">
+          {featured.slice(0, 3).map((jersey, index) => (
             <JerseyCard key={jersey.id} jersey={jersey} index={index} />
           ))}
         </div>
+
+        {/* View More Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-2xl)' }}
+        >
+          <Link href="/shop" className="neo-btn neo-btn--primary" style={{ fontSize: '1.2rem', padding: '1rem 2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            Explore All Jerseys
+            <motion.div
+              animate={{ x: [0, 8, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+              style={{ display: 'flex', alignItems: 'center' }}
+            >
+              <ArrowRight size={24} />
+            </motion.div>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

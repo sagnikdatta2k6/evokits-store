@@ -3,13 +3,17 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 
 export default function JerseyModal() {
+  const router = useRouter();
   const { selectedJersey, setSelectedJersey, addToCart } = useStore();
   const [size, setSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   useEffect(() => {
     if (selectedJersey) {
@@ -17,6 +21,8 @@ export default function JerseyModal() {
       setSize("");
       setQuantity(1);
       setJustAdded(false);
+      setIsZoomed(false);
+      setActiveImage(selectedJersey.image || (selectedJersey.gallery && selectedJersey.gallery.length > 0 ? selectedJersey.gallery[0] : null));
     } else {
       document.body.style.overflow = "unset";
     }
@@ -43,6 +49,20 @@ export default function JerseyModal() {
     setTimeout(() => {
       setSelectedJersey(null);
     }, 1000);
+  };
+
+  const handleBuyNow = () => {
+    if (!size) {
+      alert("Please select a size first!");
+      return;
+    }
+    if (stockAvailable === 0) {
+      alert("This size is out of stock!");
+      return;
+    }
+    addToCart(selectedJersey, size, quantity);
+    setSelectedJersey(null);
+    router.push("/checkout");
   };
 
   const sizes = ["S", "M", "L", "XL", "XXL"];
@@ -75,12 +95,36 @@ export default function JerseyModal() {
 
           <div className="jersey-modal-grid">
             {/* Visual Side */}
-            {selectedJersey.image ? (
-              <div 
-                className="jersey-modal-visual"
-                style={{ background: 'var(--neo-white)', border: 'var(--border-thin)' }}
-              >
-                <img src={selectedJersey.image} alt={selectedJersey.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            {activeImage ? (
+              <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', borderRight: 'var(--border-thick)' }}>
+                <div 
+                  className="jersey-modal-visual"
+                  style={{ background: 'var(--neo-white)', borderRight: 'none', borderBottom: 'var(--border-thick)', flex: 1, minHeight: 0, cursor: 'zoom-in' }}
+                  onClick={() => setIsZoomed(true)}
+                >
+                  <img src={activeImage} alt={selectedJersey.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </div>
+                {selectedJersey.gallery && selectedJersey.gallery.length > 0 && (
+                  <div className="jersey-modal-gallery">
+                    {selectedJersey.image && (
+                      <img 
+                        src={selectedJersey.image} 
+                        className={`jersey-modal-thumbnail ${activeImage === selectedJersey.image ? 'active' : ''}`}
+                        onClick={() => setActiveImage(selectedJersey.image!)}
+                        alt="Main"
+                      />
+                    )}
+                    {selectedJersey.gallery.map((g, idx) => (
+                      <img 
+                        key={idx}
+                        src={g} 
+                        className={`jersey-modal-thumbnail ${activeImage === g ? 'active' : ''}`}
+                        onClick={() => setActiveImage(g)}
+                        alt={`Gallery ${idx}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               <div 
@@ -164,19 +208,81 @@ export default function JerseyModal() {
                 </div>
               </div>
 
-              {/* Add to Cart */}
-              <button 
-                className={`neo-btn neo-btn--large ${justAdded ? 'neo-btn--lime' : 'neo-btn--primary'}`}
-                style={{ width: '100%', marginTop: 'auto', opacity: (!size || stockAvailable === 0) ? 0.5 : 1, cursor: (!size || stockAvailable === 0) ? 'not-allowed' : 'pointer' }}
-                onClick={handleAddToCart}
-                disabled={!size || stockAvailable === 0}
-              >
-                <ShoppingCart size={20} />
-                {justAdded ? "Added to Cart!" : "Add to Cart"}
-              </button>
+              {/* Action Buttons */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)', marginTop: 'auto' }}>
+                <button 
+                  className={`neo-btn neo-btn--large ${justAdded ? 'neo-btn--lime' : 'neo-btn--outline'}`}
+                  style={{ opacity: (!size || stockAvailable === 0) ? 0.5 : 1, cursor: (!size || stockAvailable === 0) ? 'not-allowed' : 'pointer' }}
+                  onClick={handleAddToCart}
+                  disabled={!size || stockAvailable === 0}
+                >
+                  <ShoppingCart size={20} />
+                  {justAdded ? "Added!" : "Add to Cart"}
+                </button>
+                <button 
+                  className="neo-btn neo-btn--large neo-btn--primary"
+                  style={{ opacity: (!size || stockAvailable === 0) ? 0.5 : 1, cursor: (!size || stockAvailable === 0) ? 'not-allowed' : 'pointer' }}
+                  onClick={handleBuyNow}
+                  disabled={!size || stockAvailable === 0}
+                >
+                  Buy Now
+                </button>
+              </div>
             </div>
           </div>
         </motion.div>
+
+        {/* Zoomed Image Overlay */}
+        <AnimatePresence>
+          {isZoomed && activeImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 4000,
+                background: 'rgba(0,0,0,0.9)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'zoom-out',
+                padding: 'var(--space-md)'
+              }}
+              onClick={() => setIsZoomed(false)}
+            >
+              <button 
+                style={{
+                  position: 'absolute',
+                  top: 'var(--space-md)',
+                  right: 'var(--space-md)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  padding: 'var(--space-sm)',
+                  zIndex: 4001
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsZoomed(false);
+                }}
+              >
+                <X size={32} />
+              </button>
+              <img 
+                src={activeImage} 
+                alt="Zoomed" 
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  objectFit: 'contain'
+                }} 
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </AnimatePresence>
   );

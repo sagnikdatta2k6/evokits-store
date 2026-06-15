@@ -14,6 +14,7 @@ export interface Jersey {
   tag?: "new" | "hot" | "sale" | "limited";
   year: string;
   image?: string;
+  gallery?: string[];
   category?: string;
   stock: Record<string, number>;
 }
