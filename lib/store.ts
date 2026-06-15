@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Jersey, jerseys as initialJerseys } from './data';
+import { Jersey, jerseys as initialJerseys, marqueeTeams } from './data';
 
 export interface CartItem {
   id: string; // unique cart item id (e.g., jersey.id + size)
@@ -61,6 +61,10 @@ interface AppState {
   // Modal State
   selectedJersey: Jersey | null;
   setSelectedJersey: (jersey: Jersey | null) => void;
+
+  // Storefront Settings
+  marqueeItems: string[];
+  updateMarqueeItems: (items: string[]) => void;
 }
 
 const defaultProfile: UserProfile = {
@@ -78,6 +82,9 @@ export const useStore = create<AppState>()(
     (set, get) => ({
       selectedJersey: null,
       setSelectedJersey: (jersey) => set({ selectedJersey: jersey }),
+
+      marqueeItems: marqueeTeams,
+      updateMarqueeItems: (items) => set({ marqueeItems: items }),
 
       cart: [],
       addToCart: (jersey, size, quantity) => {

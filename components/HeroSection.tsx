@@ -3,9 +3,21 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useStore } from "@/lib/store";
 import { marqueeTeams } from "@/lib/data";
 
 export default function HeroSection() {
+  const [isMounted, setIsMounted] = useState(false);
+  const { marqueeItems } = useStore();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Use store items if mounted, otherwise use default to prevent hydration mismatch
+  const itemsToDisplay = isMounted ? marqueeItems : marqueeTeams;
+
   return (
     <section className="hero">
       {/* Decorative floating shapes */}
@@ -186,7 +198,7 @@ export default function HeroSection() {
       {/* Marquee Ticker */}
       <div className="hero__marquee">
         <div className="hero__marquee-track">
-          {[...marqueeTeams, ...marqueeTeams].map((team, i) => (
+          {[...itemsToDisplay, ...itemsToDisplay].map((team, i) => (
             <span key={i} className="hero__marquee-item">
               <span className="hero__marquee-dot">⚽</span>
               {team}

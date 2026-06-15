@@ -1,27 +1,30 @@
 # EVOKITS Store ⚽
 
-Welcome to the **EVOKITS** repository! This is a modern, premium e-commerce platform dedicated to authentic football jerseys from the biggest clubs around the world. Built with a bold "neobrutalism" aesthetic, EVOKITS brings the passion of the pitch directly to your screen.
+Welcome to **EVOKITS** — a premium, high-performance e-commerce platform dedicated to authentic football jerseys from the world’s biggest clubs. Built with a striking "neobrutalism" aesthetic, EVOKITS combines bold design with a buttery-smooth user experience to bring the passion of the pitch directly to your screen.
 
-## ✨ Features
+## ✨ Key Features
 
-- **Premium Design:** A custom "neobrutalist" interface featuring vibrant colors, stark borders, and sleek micro-animations.
-- **Live Inventory Engine:** Real-time stock tracking. Sizes automatically deduct upon checkout and immediately reflect as "Out of Stock" to other users if depleted.
-- **Dynamic Visuals:** Supports both custom gradient silhouettes and real image uploads for jerseys.
-- **Admin Dashboard:** Fully authenticated, server-side protected admin panel to manage orders and inventory.
-- **User Profiles:** Customers can track their order history, view invoices, and manage personal details.
-- **Full Checkout Flow:** Includes cart management, wishlist, and discount code ("EVO10") capabilities.
+- **Premium Neobrutalist Design:** A completely custom interface featuring vibrant, hand-picked color palettes, stark borders, and sleek micro-animations using Framer Motion.
+- **Dynamic Visuals & Interactive Galleries:** Products support multi-image gallery uploads, complete with clickable thumbnail strips and an immersive full-screen zoom overlay.
+- **Frictionless Checkout:** Features a dedicated "Buy Now" flow that instantly redirects customers to checkout, bypassing the cart for higher conversion rates. Supports dynamic discount codes (try "EVO10").
+- **Live Inventory Engine:** Real-time stock tracking built directly into the UI. Sizes automatically deduct upon checkout and instantly reflect as "Out of Stock" to prevent overselling.
+- **Comprehensive Admin Dashboard:** 
+  - Manage live inventory, process incoming orders, and track revenue.
+  - Fully dynamic "Storefront Settings" allow admins to instantly update the live scrolling announcement ticker without touching code.
+  - Hardened security features including Two-Factor Authentication (2FA) and password management.
+- **Customer Profiles:** Users can track their order history, view detailed invoices, and manage their personal shipping details.
 
 ## 🚀 Tech Stack
 
 - **Framework:** Next.js 14 (App Router)
-- **Styling:** Vanilla CSS (Global Variables & Neobrutalism Design System)
-- **State Management:** Zustand (Persisted for Cart & Inventory)
+- **Styling:** Vanilla CSS (Scalable Custom Design System)
+- **State Management:** Zustand (Persisted for Cart, Storefront Settings, & Inventory)
 - **Animations:** Framer Motion
 - **Icons:** Lucide React
 
 ## 🛠️ Getting Started
 
-To run the EVOKITS store locally:
+Want to run the EVOKITS store locally? Follow these steps:
 
 1. **Clone the repository:**
    ```bash
@@ -45,7 +48,7 @@ To run the EVOKITS store locally:
 
 ## 🤝 Contributing
 
-This project is currently a prototype built for the love of the game. Feel free to fork, explore, and submit pull requests if you have cool ideas!
+This project is built for the love of the game. Whether you have ideas for new features, design tweaks, or bug fixes, feel free to fork the repository and submit a pull request!
 
 ---
 

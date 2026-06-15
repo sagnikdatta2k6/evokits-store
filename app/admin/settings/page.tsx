@@ -1,9 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Lock, ShieldCheck, ShieldAlert, Key } from "lucide-react";
+import { Save, Lock, ShieldCheck, ShieldAlert, Key, Plus, Trash2, List } from "lucide-react";
+import { useStore } from "@/lib/store";
 
 export default function AdminSettingsPage() {
+  const { marqueeItems, updateMarqueeItems } = useStore();
+  const [localMarquee, setLocalMarquee] = useState<string[]>([]);
+
+  useEffect(() => {
+    setLocalMarquee(marqueeItems);
+  }, [marqueeItems]);
+
   const [storeName, setStoreName] = useState("EVOKITS");
   const [contactEmail, setContactEmail] = useState("contact@evokits.com");
   const [taxRate, setTaxRate] = useState("0");
@@ -31,6 +39,12 @@ export default function AdminSettingsPage() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     alert("Settings saved successfully! (Mock)");
+  };
+
+  const handleSaveMarquee = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateMarqueeItems(localMarquee.filter(item => item.trim() !== ""));
+    alert("Marquee settings saved successfully!");
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -104,26 +118,75 @@ export default function AdminSettingsPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-xl)', alignItems: 'start' }}>
         
-        {/* Left Column: General Settings */}
-        <div className="neo-card">
-          <h2 style={{ marginBottom: 'var(--space-lg)' }}>General</h2>
-          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-            <div>
-              <label className="neo-label">Store Name</label>
-              <input type="text" className="neo-input" value={storeName} onChange={(e) => setStoreName(e.target.value)} />
-            </div>
-            <div>
-              <label className="neo-label">Contact Email</label>
-              <input type="email" className="neo-input" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
-            </div>
-            <div>
-              <label className="neo-label">Tax Rate (%)</label>
-              <input type="number" className="neo-input" value={taxRate} onChange={(e) => setTaxRate(e.target.value)} />
-            </div>
-            <button type="submit" className="neo-btn neo-btn--primary" style={{ marginTop: 'var(--space-md)', alignSelf: 'flex-start' }}>
-              <Save size={18} /> Save Settings
-            </button>
-          </form>
+        {/* Left Column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
+          {/* General Settings */}
+          <div className="neo-card">
+            <h2 style={{ marginBottom: 'var(--space-lg)' }}>General</h2>
+            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+              <div>
+                <label className="neo-label">Store Name</label>
+                <input type="text" className="neo-input" value={storeName} onChange={(e) => setStoreName(e.target.value)} />
+              </div>
+              <div>
+                <label className="neo-label">Contact Email</label>
+                <input type="email" className="neo-input" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+              </div>
+              <div>
+                <label className="neo-label">Tax Rate (%)</label>
+                <input type="number" className="neo-input" value={taxRate} onChange={(e) => setTaxRate(e.target.value)} />
+              </div>
+              <button type="submit" className="neo-btn neo-btn--primary" style={{ marginTop: 'var(--space-md)', alignSelf: 'flex-start' }}>
+                <Save size={18} /> Save Settings
+              </button>
+            </form>
+          </div>
+
+          {/* Marquee Settings */}
+          <div className="neo-card">
+            <h2 style={{ marginBottom: 'var(--space-lg)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <List size={20} /> Scrolling Ticker Settings
+            </h2>
+            <form onSubmit={handleSaveMarquee} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+              {localMarquee.map((item, index) => (
+                <div key={index} style={{ display: 'flex', gap: 'var(--space-sm)' }}>
+                  <input 
+                    type="text" 
+                    className="neo-input" 
+                    value={item} 
+                    onChange={(e) => {
+                      const newItems = [...localMarquee];
+                      newItems[index] = e.target.value;
+                      setLocalMarquee(newItems);
+                    }}
+                    placeholder="e.g. 50% OFF ALL JERSEYS"
+                    style={{ flex: 1 }}
+                  />
+                  <button 
+                    type="button" 
+                    className="neo-btn neo-btn--small neo-btn--pink"
+                    onClick={() => {
+                      const newItems = localMarquee.filter((_, i) => i !== index);
+                      setLocalMarquee(newItems);
+                    }}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+              <button 
+                type="button" 
+                className="neo-btn neo-btn--outline" 
+                onClick={() => setLocalMarquee([...localMarquee, ""])}
+                style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
+                <Plus size={16} /> Add Item
+              </button>
+              <button type="submit" className="neo-btn neo-btn--primary" style={{ marginTop: 'var(--space-md)', alignSelf: 'flex-start' }}>
+                <Save size={18} /> Save Ticker
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Right Column: Security */}
