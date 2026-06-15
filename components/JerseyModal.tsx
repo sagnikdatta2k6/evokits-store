@@ -214,7 +214,6 @@ export default function JerseyModal() {
                   className={`neo-btn neo-btn--large ${justAdded ? 'neo-btn--lime' : 'neo-btn--outline'}`}
                   style={{ opacity: (!size || stockAvailable === 0) ? 0.5 : 1, cursor: (!size || stockAvailable === 0) ? 'not-allowed' : 'pointer' }}
                   onClick={handleAddToCart}
-                  disabled={!size || stockAvailable === 0}
                 >
                   <ShoppingCart size={20} />
                   {justAdded ? "Added!" : "Add to Cart"}
@@ -223,7 +222,6 @@ export default function JerseyModal() {
                   className="neo-btn neo-btn--large neo-btn--primary"
                   style={{ opacity: (!size || stockAvailable === 0) ? 0.5 : 1, cursor: (!size || stockAvailable === 0) ? 'not-allowed' : 'pointer' }}
                   onClick={handleBuyNow}
-                  disabled={!size || stockAvailable === 0}
                 >
                   Buy Now
                 </button>
