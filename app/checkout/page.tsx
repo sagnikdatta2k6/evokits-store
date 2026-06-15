@@ -13,6 +13,7 @@ export default function CheckoutPage() {
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
   const [processing, setProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cod">("card");
 
   const subtotal = cart.reduce((acc, item) => acc + (item.jersey.price * item.quantity), 0);
   const total = subtotal - discount;
@@ -98,27 +99,54 @@ export default function CheckoutPage() {
                 <ShieldCheck size={24} /> Secure Payment
               </h2>
               <form onSubmit={handlePayment} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-                <div>
-                  <label className="neo-label">Card Number</label>
-                  <input type="text" className="neo-input" placeholder="0000 0000 0000 0000" required />
+                <div style={{ display: 'flex', gap: 'var(--space-lg)', marginBottom: 'var(--space-md)' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 700 }}>
+                    <input 
+                      type="radio" 
+                      name="payment_method" 
+                      checked={paymentMethod === 'card'} 
+                      onChange={() => setPaymentMethod('card')} 
+                      style={{ accentColor: 'var(--neo-black)', width: '18px', height: '18px' }} 
+                    />
+                    Credit / Debit Card
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 700 }}>
+                    <input 
+                      type="radio" 
+                      name="payment_method" 
+                      checked={paymentMethod === 'cod'} 
+                      onChange={() => setPaymentMethod('cod')} 
+                      style={{ accentColor: 'var(--neo-black)', width: '18px', height: '18px' }} 
+                    />
+                    Cash on Delivery (COD)
+                  </label>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
-                  <div>
-                    <label className="neo-label">Expiry Date</label>
-                    <input type="text" className="neo-input" placeholder="MM/YY" required />
-                  </div>
-                  <div>
-                    <label className="neo-label">CVV</label>
-                    <input type="text" className="neo-input" placeholder="123" required />
-                  </div>
-                </div>
-                <div>
-                  <label className="neo-label">Name on Card</label>
-                  <input type="text" className="neo-input" placeholder="JOHN DOE" required />
-                </div>
-                
+
+                {paymentMethod === 'card' && (
+                  <>
+                    <div>
+                      <label className="neo-label">Card Number</label>
+                      <input type="text" className="neo-input" placeholder="0000 0000 0000 0000" required />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+                      <div>
+                        <label className="neo-label">Expiry Date</label>
+                        <input type="text" className="neo-input" placeholder="MM/YY" required />
+                      </div>
+                      <div>
+                        <label className="neo-label">CVV</label>
+                        <input type="password" maxLength={4} className="neo-input" placeholder="123" required />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="neo-label">Name on Card</label>
+                      <input type="text" className="neo-input" placeholder="JOHN DOE" required />
+                    </div>
+                  </>
+                )}
+
                 <button type="submit" className="neo-btn neo-btn--dark neo-btn--large" style={{ marginTop: 'var(--space-md)', width: '100%', justifyContent: 'center' }} disabled={processing}>
-                  {processing ? "Processing Secure Payment..." : `Pay ₹${total.toLocaleString("en-IN")}`}
+                  {processing ? "Processing Order..." : paymentMethod === 'card' ? `Pay ₹${total.toLocaleString("en-IN")}` : `Confirm Cash on Delivery`}
                 </button>
               </form>
             </div>
